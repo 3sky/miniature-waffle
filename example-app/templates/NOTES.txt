@@ -1,0 +1,15 @@
+1. Go and see you app in GUI on following url:
+ELB=$(kubectl get svc {{ include "example-app.fullname" . }} -n {{ .Values.namespace }} --output jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+
+2. Set DNS name with CloudFlare:
+```bash
+TOEKN=xxxxx
+curl -X POST "https://api.cloudflare.com/client/v4/zones/5a6b7fdcb88649ca23733e8d88a4b569/dns_records" \
+     -H "Authorization: Bearer $TOKEN" \
+     -H "Content-Type: application/jsoyn" \
+     --data '{"type":"CNAME","name":"app","content":"$ELB","ttl":1,"proxied":true}'
+```
+3. Check the result
+```bash
+dig CNAME +short app.3sky.dev
+```
